@@ -1,0 +1,659 @@
+---
+title: "R in action"
+date: "2019-04-19"
+output: 
+  revealjs::revealjs_presentation:
+    self_contained: TRUE
+    reveal_options:
+      slideNumber: true
+      previewLinks: true
+      chalkboard:
+        theme: whiteboard
+        toggleNotesButton: true
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+```
+
+## {}
+
+![](img/books.png)
+
+https://www.manning.com/
+
+https://r4ds.had.co.nz/
+
+
+## Content
+
+* **What is R** and who uses R?
+* My R **journey**
+* **Tidyverse** approach vs base-R
+* Fun **use cases** implemented with R
+* **Web application** in 5 minutes
+
+# What is R?
+
+## {}
+
+How developers play board games?
+
+![](img/r_funny.jpg){width=45%}
+
+## {}
+
+R is a system for statistical computation and graphics. It provides, among other things, a programming language, high level graphics, interfaces to other languages and debugging facilities.
+
+> "The best thing about R is that it was written by statisticians. The worst thing about R is that it was written by statisticians."
+
+> ~20% of base R is written in R.
+ 
+
+## What is R capable of?
+
+* **Statistical modelling**
+* **Machine learning**
+* Data Access (Spark, RDMS, APIs, etc.)
+* Visualization
+* Interaction with other languages
+* Building WEB applications and REST APIs
+* Other fun things https://awesome-r.com/
+
+## R usage in different companies 
+
+* **Facebook** - For behavior analysis related to status updates and profile pictures
+* **Google** - For advertising effectiveness and economic forecasting
+* **Twitter** - For data visualization and semantic clustering
+* Microsoft - Acquired Revolution R company and use it for a variety of purposes
+* Uber - For statistical analysis
+* Airbnb - Scale data science
+* IBM - Joined R Consortium Group
+* ANZ - For credit risk modeling
+
+## More companies
+
+![](img/R_usage.png)
+
+## R popularity
+
+![](img/R_questions.png){width=60%}
+
+## Everybody likes R
+
+![](img/dislikes.png){width=70%}
+
+## R can be fast
+
+![](img/benchmark.png){width=70%}
+
+https://h2oai.github.io/db-benchmark/groupby.html (**Hardware:** 20 x 2,6 GHz CPU, 126 GB DDR4 RAM)
+
+## Lots of packages
+
+```{r, eval = FALSE}
+nrow(available.packages())
+```
+
+![](img/cran_packages.png){width=75%}
+
+Even more packages on GitHub - **64615** 
+
+
+## Data Science
+
+![](img/ds-vs-pap.jpg)
+
+> Python is king, but R kernels are more likely to win medals in Kaggle
+
+# My journey with R
+
+## {}
+
+```{r, include=FALSE}
+r_usage <- read.csv("img/r_usage.csv")
+```
+
+```{r, echo=FALSE}
+ggplot(r_usage, aes(x = time, color = tool)) +
+  geom_path(aes(y = usage), size=1.5, position="jitter") +
+  ggtitle("My usage of different tools") + 
+  scale_y_discrete() +
+  xlim(2007, 2020) +
+  theme_minimal()
+```
+
+## {}
+
+Where I use R:
+
+* Data access
+* Data manipulation
+* High level data analysis
+* Data visualization
+* Prototyping
+* Web applications
+
+## Why I hated R at first
+
+TOO MANY OPTIONS
+```{r, eval = FALSE}
+summary(mydata$x)
+summary(mydata$"x")
+summary(mydata["x"])
+summary(mydata[,"x"])
+summary(mydata[["x"]])
+summary(mydata[1])
+summary(mydata[,1])
+summary(mydata[[1]])
+with(mydata, summary(x))
+attach(mydata)
+  summary(x)
+summary(subset(mydata, select=x))
+```
+
+## Why I hated R at first
+
+TOO MANY OBJECTS (and a messy code)
+
+```{r, eval = FALSE}
+my_data_object <- read.csv("a_messy_csv_file.csv")
+my_data_object$string <- as.character(my_data_object$string)
+my_data_object$mean_of_smth <- mean(my_data_object$some_numeric_variable)
+colnames(my_data_object) <- c("random name", "test","average", "b")
+filtered_data <-  my_data_object[!is.na(my_data_object$b) & my_data_object$b > 10,]
+lets_filter_one_more_time <- filtered_data[!is.na(filtered_data$test),]
+lets_randomly_create_new_data_object <- lets_filter_one_more_time[, 3]
+```
+
+## Why I hated R at first (2008-ish)
+
+* Pretty ugly code
+* Not pretty reports
+* Lack of processing power
+* Not user (loser) friendly IDE
+* Lack of packages
+
+![](img/r_gui.png){width=40%}
+
+## {}
+
+Solution - the **tidyverse** approach! 
+
+![](img/jesus.jpg){width=60%}
+
+## Tidyverse approach
+
+The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures.
+
+![](img/tidyverse2.png)
+
+## Tidyverse data pipeline
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+your_data %>%
+  select(Variable, Size, Random, test) %>%
+  filter(Size == "Large") %>%
+  mutate(test2 = substr(test, 1, 2)) %>%
+  group_by(test2) %>%
+  summarize(avg_variable = mean(Variable)) %>%
+  arrange(avg_variable)
+```
+
+## Tidyverse structure
+
+![](img/tidyverse1.png){width=60%}
+
+```{r}
+tidyverse_packages()
+```
+
+
+## ... and notebooks, of course
+
+![](img/notebook.png){width=60%}
+
+* RMarkdown (RStudio)
+* Jupyter Notebook
+
+# Use cases
+
+## {}
+
+![](img/speak_r.jpg){width=60%}
+
+## Exploratory data analysis
+
+![](img/databases.png){width=60%}
+
+![](img/sparkR.png){width=30%}
+
+## {}
+Connect to the Data Lake:
+
+```{r, eval = FALSE}
+con <- dbConnect(odbc(), "ODBC_driver_name")
+```
+
+Connect to RDMS:
+
+```{r, eval = FALSE}
+con <- dbConnect(odbc(),
+                 Driver = "SQL Server",
+                 Server = "production_server",
+                 Database = "jjj",
+                 UID = "yyy",
+                 PWD = "xxx",
+                 Port = 1433)
+```
+
+That's it!
+
+```{r, eval = FALSE}
+dbGetQuery(con, "SHOW DATABASES;")
+r_table <- dbGetQuery(con, "SELECT * FROM SOME_TABLE;")
+# or 
+dbplyr_table <- tbl(con, "SOME_TABLE")
+```
+
+## {}
+Connecting to Spark via Jupyter notebook:
+![](img/sparkR1.PNG)
+
+Other options:
+
+* Linux shell
+* RStudio server
+* Local R instance (via Apache Livy)
+
+**sparklyr - another R interface for Spark**
+
+## {}
+Data profiling using SparkR interface:
+
+![](img/sparkR2.PNG)
+
+## Kafka and timeseries forecasting
+
+![](img/kafka-apis.png){width=60%}
+
+## {}
+rkafka library for Kafka interface in R:
+```{r, eval = FALSE}
+library(rkafka)
+```
+
+Consume Kafka messages (create JAVA object):
+```{r, eval = FALSE}
+consumer <- rkafka.createConsumer(zookeeperConnect = "xxxxx:8888",
+                                  topicName = "gasprices_full",
+                                  groupId = "group_id",
+                                  autoCommitEnable = "false",
+                                  autoOffsetReset = "smallest")
+```
+Read messages:
+```{r, eval = FALSE}
+rkafka.readPoll(consumer)
+rkafka.read(consumer)
+```
+
+## {}
+
+Parse received data (jsonlite):
+```{r, eval = FALSE}
+df <- data.frame(stringsAsFactors = FALSE)
+for (i in (1:length(prices))){
+  message <- prices[i] %>% 
+  fromJSON(flatten = TRUE)
+df <- bind_rows(df, c(Date = message$Date, Price = message$Price))
+}
+```
+
+Tidy data (tidyr):
+```{r, eval = FALSE}
+gas_prices <- df %>%
+  as_tibble() %>%
+  mutate(Date = as.Date(Date), Price = as.numeric(Price)) %>%
+  complete(Date = seq.Date(min(Date), max(Date), by="day")) %>%
+  fill(Price) %>%
+  filter(Date > "2016-01-01")
+```
+## {}
+
+"Data science" in 5 minutes:
+```{r, eval = FALSE}
+ts <- tk_ts(gas_prices, start = 2016, frequency = 365, silent = TRUE)
+fit_ts <- ts %>%
+    HoltWinters()
+fcast_ts <- fit_ts %>%
+    forecast(h = 180)
+```
+![](img/timeseries.png)
+
+## JIRA dependencies
+
+![](img/jira_interface.png){width=50%}
+
+```{r, eval = FALSE}
+initiatives <- tbl(con, in_schema("jiraschema", "jiraissue")) %>%
+  filter(PROJECT %in% c("aaaa", "bbb", "ccccc") & issuetype == "xxx") %>%
+  left_join(select(tbl(con, in_schema("jiraschema", "issuetype")), pname, ID), by = c("issuetype" = "ID")) %>%
+  rename(issue_type = pname) %>%
+  left_join(select(tbl(con, in_schema("jiraschema", "issuestatus")), pname, ID), by = c("issuestatus" = "ID")) %>%
+  rename(issue_status = pname) %>%
+  left_join(select(tbl(con, in_schema("jiraschema", "PROJECT")), pname, ID, pkey), by = c("PROJECT" = "ID")) %>%
+  rename(project_name = pname, project_key = pkey.y) %>%
+  collect()
+```
+
+## {}
+Dealing with Portfolio management plugin data:
+![](img/JIRA_portfolio.PNG)
+
+JSON structure:
+
+![](img/portfolio_json.png)
+
+## {}
+
+Get all solution related entries:
+```{r, eval = FALSE}
+SOLUTION <- tbl(con, in_schema("jiraschema", "AO_D9132D_SOLUTION")) %>%
+  filter(str_detect(SOLUTION, '"xxxxx"')) %>% 
+  collect()
+```
+
+Create a dataframe for issue links/dependencies:
+```{r, eval=FALSE}
+links <- lastsolution$solution$hierarchy %>%
+  melt() %>%
+  mutate(type = "hierarchy") %>%
+  union_all(lastsolution$solution$issueDependents %>%
+  melt() %>%
+  mutate(type = "issueDependents")) %>%
+  rename(from = value, to = L1)
+```
+
+**Network** visualization using JavaScript libraries:
+```{r, eval = FALSE}
+library(visNetwork)
+visnet <- visNetwork(vis.nodes, vis.links) %>%
+  ...
+```
+
+## {}
+
+![](img/jira.png)
+
+
+## {}
+
+![](img/jira2.PNG)
+
+## Deep learning + building REST API
+
+Customer review classification in Lithuanian language
+
+![](img/master1.PNG)
+
+## {}
+REST API response example: 
+![](img/master2.PNG)
+
+## {}
+
+Creating TF model in R:
+```{r, eval=FALSE}
+model <- keras_model_sequential() %>%
+  layer_embedding(input_dim = c(max_words), output_dim = 128,
+                  input_length = c(maxlen)) %>%
+  layer_flatten() %>%
+  layer_dense(units = 3, activation = "softmax") %>% 
+  compile(
+  optimizer = "adam",
+  loss = "categorical_crossentropy",
+  metrics = c("acc")
+  )
+```
+
+Deploying the model:
+```{r, eval=FALSE}
+library(tfdeploy)
+serve_savedmodel("final_model", host = "127.0.0.1", port = 8089)
+```
+
+## {}
+
+Creating REST API for data entry:
+```{r, eval=FALSE}
+#* @get /version
+model_version <- function() {
+  result <- data.frame(
+    "status" = 200,
+    "api_version" = VERSION
+  )
+  return(result)
+}
+```
+
+Running REST API:
+```{r, eval=FALSE}
+library(plumber)
+r <- plumb("API.R")
+r$run(port=8000)
+```
+
+## Log analytics  
+
+<font size="5">Problem no. 1 - track testing activities</font>
+
+<font size="6">Problem no. 2 - monitoring activities</font>
+
+<font size="7">Problem no. 3 - anomaly detection in the server logs</font>
+
+## {}
+
+* 2.5 GB of log files
+* 2000+ automated tests
+
+```{bash, eval=FALSE}
+Started by user [8maha:////4LPCl/hG3BqvHgSrKRfoOIjnkAUEcTIfAH4/u4RYPGaasasassa9b85aBtbiIQTGjNKU4P08vOT+vOD8nVc83PyU1x6OyILUoJzMv2y+/JJUBAhiZGBgqihhk0NSjKDWzXb3RdlLBUSYGJk8GtpzUvPSSDB8G5tKinBIGIZ+sxLJE/ZzEvHT94JKizLx0a6BxUmjGOUNodHsLgAz+EgYe/dLi1CL9YnMDS8MkAEL/AdzBAAAA[0mTestuotojas Testuotojas
+Building in workspace /opt/app/jenkins/workspace/XXX tests/XXXXX
+ > git rev-parse --is-inside-work-tree # timeout=10
+Fetching changes from the remote Git repository
+```
+
+![](img/jenkins.png){width=55%}
+
+
+## {}
+
+* 2351810 log lines
+* 10104 files
+
+```{bash, eval=FALSE}
+[2018-11-01 02:08:37,633] INFO [GroupMetadataManager brokerId=1003] Removed 0 expired offsets in 1 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+[2018-11-01 02:10:20,126] INFO [GroupCoordinator 1003]: Member consumer-105-53acxxxd95-7a99-4f87-a382-1df851415401 in group xxxxxxxxx has failed, removing it from the group (kafka.coordinator.group.GroupCoordinator)
+```
+
+![](img/kafka_log_analysis.png){width=80%}
+
+## {}
+
+* Feature selection from log files (kafka server states)
+* Markov chain model implemented for normal activities
+
+![](img/kafka_logs.png){width=120%}
+
+
+## SEB Pool table
+
+![](img/seb_pool.jpg){width=90%}
+
+## {}
+
+THE START OF A DATA JOURNEY
+
+```{bash, eval = FALSE}
+tail -f game.json | nc -lk 445
+```
+
+...
+ 
+```{json, eval = FALSE}
+[{ "gameId": 3, "name": "gameStart", "time": 1541957192}] 
+[{ "gameId": 3, "combinationId": 0, "name": "whiteStartedMoving", "x": 0.028963912, "y": 0.8928387, "time": 1541957205}] 
+[{ "gameId": 3, "combinationId": 0, "name": "combinationStart", "time": 1541957220}] 
+[{ "gameId": 3, "combinationId": 0, "name": "whiteStartPosition", "x": 0.44422802, "y": 0.56917685, "time": 1541957220}]
+```
+
+...
+
+![](img/diagram_png.png)
+
+## ![](img/1.png)
+
+## ![](img/2.png)
+
+## {}
+
+ggplot2 to the resque!
+
+```{r, eval = FALSE}
+    ggplot() +
+      annotation_custom(rasterGrob(pool_img,
+                                   width = unit(1, "npc"),
+                                   height = unit(1,"npc")),
+                                   xmin = -0.09,
+                                   xmax = 1.09,
+                                   ymin = -0.29,
+                                   ymax = 1.29) +
+      geom_point(data = white_ball, aes(x = x, y = y), size = 15, color = "white") +
+      geom_point(data = df, aes(x = x, y = y), size = 2, linetype = 2, color = "blue") +
+      geom_path(data = balls, aes(x = x, y = y, color = as.factor(ball_id)), size = 15, show.legend = FALSE) +
+      scale_color_manual(values=c("lightblue", "blue")) + 
+      geom_text(data = balls, aes(x = x, y = y, label = ball_id), size = 5) +
+      ylim(0, 1) +
+      xlim(0, 1) +
+      theme_transparent()
+```
+
+## {}
+
+Reactive polling in order to observe the database without refreshing the app:
+
+```{r, eval = FALSE}
+data <- reactivePoll(500, session,
+  checkFunc = function() {
+    (dbGetQuery(conn, paste0('SELECT id FROM ', 
+    table_name, 
+    ' ORDER BY id DESC LIMIT 1'))
+    )
+  },
+  valueFunc = function() {
+    (dbReadTable(conn, table_name) %>%
+    filter(game_id == dbGetQuery(conn, paste0('SELECT game_id from ', 
+      table_name, 
+      ' ORDER BY time DESC LIMIT 1'))[1,1]) %>%
+    mutate(x = x, y = 1 - y)
+    ) 
+  }
+  )
+```
+
+## FIFA WC 2018 in SEB
+
+![](img/fifa.png)
+
+## Predicting football results
+
+![](img/horse.jpg) 
+
+>- In a classic example, Bortkiewicz (1898) studied the distribution of 122 men kicked to death by horses among ten Prussian army corps over 20 years.
+
+## {}
+
+![](img/poisson.png) 
+
+![](img/poisson_dist.png)
+
+## {} 
+
+![](img/fifa_app.png)
+
+## Outcome
+
+* 2017 - Everybody in the team knows that R exists
+* 2018 - R and Jupyter in Analytics environment
+* 2018 - Everybody in the team thinks R is powerful
+* 2019 - R and Shiny server on system test server
+* 2019 - R and Shiny server on PRODUCTION monitoring server
+
+# Build your first Shiny app in 5 minutes
+
+## Choose your IDE
+
+* **RStudio**
+* Jupyter
+* R Tools for Visual Studio
+* Eclipse
+and more
+
+![](img/rstudio.PNG) 
+
+## Shiny package + Shiny Server
+
+Shiny is a new package from RStudio that makes it incredibly easy to build interactive web applications with R.
+
+* Deploy to the cloud (shinyapps.io)
+* Deploy on-premises (open source)
+* Deploy on-premises (commercial) 
+* Use Docker
+
+![](img/docker-loves-r.png) 
+
+## Shiny app example
+
+ui.R
+```{r, eval = FALSE}
+fluidPage(
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("obs", "Number of observations:", min = 10, max = 500, value = 100)
+    ),
+    mainPanel(plotOutput("distPlot"))
+  )
+)
+```
+
+server.R
+```{r, eval = FALSE}
+function(input, output) {
+  output$distPlot <- renderPlot({
+    hist(rnorm(input$obs), col = 'darkgray', border = 'white')
+  })
+}
+```
+
+## Application "deployment" on Shiny server
+
+```{bash, eval = FALSE}
+sudo cp -R /home/your_user/your_directory/* /srv/shiny-server/your_app
+```
+
+## First steps
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
+install.packages("rmarkdown")
+install.packages("shiny")
+```
+
+```{r, eval = FALSE}
+?tidyverse
+?shiny
+?rmarkdown
+```
+
+
+# Thank you for your time! 
